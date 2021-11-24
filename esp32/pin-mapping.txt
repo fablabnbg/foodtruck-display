@@ -1,0 +1,52 @@
+In Arduino IDE, the the board is named
+	ESP32 Arduino -> DOIT ESP 32 DEVKIT V1
+Sketch blinky-OTA-jw.ino loads.
+
+
+				jw, Sa 20. Nov 03:27:23 CET 2021
+
+We need many output pins. 
+According to https://randomnerdtutorials.com/esp32-pinout-reference-gpios/ these are safe:
+
+GPIO	comment					WROOM32-DevKit	NJ1
+----	-------					----------	-----
+1						WROOM32-TX0	25 DATA15 (30 row version only)
+2	builtin LED				WROOM32-D2	24 DATA14 (30 row version only)
+3						WROOM32-RX0	23 DATA13 (30 row version only)
+
+
+4		not on TTGO	(oled LEDK)	WROOM32-D4	22 DATA12
+5	bootPWM	not on TTGO	(oled CS)	WROOM32-D5	21 DATA11
+                                                                
+12						WROOM32-D12	19 DATA10
+13						WROOM32-D13	18 DATA9
+14	bootPWM	not on TTGO	(PWR_EN)	WROOM32-D14	17 DATA8
+15	bootPWM					WROOM32-D15	16 DATA7
+16		not on TTGO	(oled RS)	WROOM32-RX2	15 DATA6
+17						WROOM32-TX2	14 DATA5
+18		not on TTGO	(oled SCL)	WROOM32-D18	12 DATA4
+19		not on TTGO	(oled SDA)	WROOM32-D19	11 DATA3
+                                                                
+21		TTGO: 10k pullup		WROOM32-D21	10 DATA2
+22		TTGO: 10k pullup		WROOM32-D22	 9 DATA1
+23		not on TTGO	(oled RESET)	WROOM32-D23	 8 D1
+                                                                
+25						WROOM32-D25	 5 DCLK1
+26						WROOM32-D26	 4 LAT1
+27	OE1 has a 5V pullup. We add a 3v3 Z!	WROOM32-D27	 3 OE1
+                                                                          
+32						WROOM32-D32	 2 B1
+33						WROOM32-D33	 1 A1
+
+
+TTGO: Need 6 more pins for DATA7..DATA12 
+WROOM32: All 18 pins fit. (one spare for the LED :-) )
+
+Oops, there are two versions of the hubs:
+ - The 24 rows version requires 18 pins.
+ - the 30 rows version requires 21 pins. 
+   Luckily, the WROOM32 can do that, using D2 (with the LED) and also both TX0 and RX0
+
+
+
+
