@@ -1,8 +1,11 @@
 /* 
- *  blinky-OTA-jw -- exercise OTA a bit, and run some dots along the led array
+ *  knightrider-OTA-jw -- exercise OTA a bit, and run some dots along the led array
  *  
  *  Frst upload using Tools -> Port: -> Serial ports -> /dev/ttyUSB0
  *  Subsequent uploads: wheon in the same network: networkPorts should show up underneath the serial port.
+ *
+ * (C) 2021, juergen@fabmail.org, distribute under GPLv2 or ask.
+ *
  */
 #include <WiFi.h>
 #include <ESPmDNS.h>
