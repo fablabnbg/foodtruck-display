@@ -13,24 +13,29 @@
 #include <ArduinoOTA.h>
 
 #include "credentials.h"
-#ifndef WLAN_PASS
-# error "WLAN_PASS is undefined"
+#ifndef USE_WIFI
+# define USE_WIFI 0
 #endif
-#ifndef WLAN_SSID
-# error "WLAN_SSID is undefined"
-#endif
-#ifndef OTA_PASSWORD_HASH
-# error "OTA_PASSWORD_HASH is undefined"
-#endif
-#ifndef OTA_PORT
-# define OTA_PORT 3232
-#endif
+#if USE_WIFI
+# ifndef WLAN_PASS
+#  error "WLAN_PASS is undefined"
+# endif
+# ifndef WLAN_SSID
+#  error "WLAN_SSID is undefined"
+# endif
+# ifndef OTA_PASSWORD_HASH
+#  error "OTA_PASSWORD_HASH is undefined"
+# endif
+# ifndef OTA_PORT
+#  define OTA_PORT 3232
+# endif
 
 #define HOSTNAME "jw-blinky"
 #define WIFI_CONNECT_WAITS 4     // min. recommended: 6. then try a reconnect()
 #define WIFI_CONNECT_ATTEMPTS 1  // min. recommended: 2. then continue without OTA
 
 String hostname = String(HOSTNAME);
+#endif
 
 #define ACTIVE_ROWS 24		// 1, ... 24, 30 
 
@@ -46,6 +51,7 @@ unsigned long previousMillis = 0;   // will store last time LED was updated
 unsigned long wifi_check_ticks_delay = 200;  // 20 seconds, based on a 100msec tick_interval
 unsigned long wifi_check_ticker = 0;    // counter
 
+#if USE_WIFI
 void initWiFi()
 {
   const char *c_hostname = hostname.c_str();
@@ -159,6 +165,7 @@ void initWiFi()
   Serial.print( "WiFi.getHostname: ");
   Serial.println(WiFi.getHostname());    
 }
+#endif
 
 
 #define FB_N_ROWS 30
@@ -375,9 +382,9 @@ void knightrider_tick()
     i = knightrider_pos[row];
     g = i & 0x03;	// two bits, for four groups
     i >>= 2;		// remove these two bits
-    // p = &framebuffer[row][g][3*i];  // pointer to rgb value
+    p = &framebuffer[row][g][3*i];  // pointer to rgb value
     // cheat a bit: we want to see more than just one boring dot,
-    p = &framebuffer[(row==8) ? 0 : row][g][3*i];  // pointer to rgb value
+    // p = &framebuffer[(row==8) ? 0 : row][g][3*i];  // pointer to rgb value
     c = &knightrider_colors[knightrider_color_idx][0];  // pointer to rgb color triplet
     *p++ = *c++;
     *p++ = *c++;
@@ -422,16 +429,20 @@ void setup()
   Serial.begin(115200);
   Serial.println("Booting");
 
+#if USE_WIFI
   byte mac[6];
   WiFi.macAddress(mac);
   hostname += String("-") + String(mac[4], HEX) + String(mac[5], HEX);
   
   initWiFi();
+#endif
 }
 
 void loop()
 {
+#if USE_WIFI
   ArduinoOTA.handle();
+#endif
 
   // nonblocking blink
   unsigned long currentMillis = millis();
@@ -446,6 +457,7 @@ void loop()
 
     wifi_check_ticker++;
   }
+#if USE_WIFI
   if (wifi_check_ticker > wifi_check_ticks_delay)
   {
     // Reference:
@@ -459,8 +471,10 @@ void loop()
       WiFi.reconnect();
     }
   }
+#endif
 
   knightrider_tick();
-  send_one_row_bb(0);
-  send_one_row_bb(0);
+  for (int row = 0; row < 8; row++)
+    send_one_row_bb(row+8);
+  // send_one_row_bb(0);
 }
